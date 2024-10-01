@@ -60,32 +60,71 @@ const initializer = () => {
     const span = document.createElement("span"); // Create a span to hold the styled text
     span.style[styleProperty] = value; // Set the desired style
 
-    range.surroundContents(span); // Surround the selected text with the styled span
+    // Surround the selected text with the styled span
+    range.surroundContents(span);
 };
 
-// function getFontName() {
-//     // Assuming you have a way to select the font
-//     const selectedFont = /* your logic to get the selected font */;
-//     if (selectedFont) {
-//         console.log(`Command: fontName\nValue: ${selectedFont}`);
-//         return selectedFont;
-//     } else {
-//         console.log(`Command: fontName\nValue: null`);
-//         return null;
-//     }
-// }
-
-// Call this function wherever you need to check the font
-getFontName();
-
-  // Main logic
-  const modifyText = (command, defaultUi, value) => {
+// Main logic
+const modifyText = (command, defaultUi, value) => {
     console.log("Command:", command);
-console.log("Value:", value);
+    console.log("Value:", value);
 
-      document.execCommand(command, defaultUi, value);
-    
-  };
+    switch (command) {
+        case "fontName":
+            applyStyleToSelection("fontFamily", value); // Apply font family
+            break;
+        case "fontSize":
+            applyStyleToSelection("fontSize", value + "pt"); // Apply font size with unit
+            break;
+        case "foreColor":
+            applyStyleToSelection("color", value); // Apply font color
+            break;
+        case "bold":
+            document.execCommand("bold", defaultUi, null); // Apply bold
+            break;
+        case "italic":
+            document.execCommand("italic", defaultUi, null); // Apply italic
+            break;
+            case "underline":
+            document.execCommand("underline", defaultUi, null); // Apply italic
+            break;
+            case "strikethrough":
+            document.execCommand("strikethrough", defaultUi, null); // Apply italic
+            break;
+            case "superscript":
+            document.execCommand("superscript", defaultUi, null); // Apply italic
+            break;
+            case "subscript":
+            document.execCommand("subscript", defaultUi, null); // Apply italic
+            break;
+            case "insertOrderedList":
+            document.execCommand("insertOrderedList", defaultUi, null); // Apply italic
+            break;
+            case "insertUnorderedList":
+            document.execCommand("insertUnorderedList", defaultUi, null); // Apply italic
+            break;
+            case "undo":
+            document.execCommand("undo", defaultUi, null); // Apply italic
+            break;
+            case "redo":
+            document.execCommand("redo", defaultUi, null); // Apply italic
+            break;
+            case "justifyLeft":
+            document.execCommand("justifyLeft", defaultUi, null); // Apply italic
+            break;
+            case "justifyCenter":
+            document.execCommand("justifyCenter", defaultUi, null); // Apply italic
+            break;
+            case "justifyRight":
+            document.execCommand("justifyRight", defaultUi, null); // Apply italic
+            break;
+        
+        // Add other cases for alignments, spacings, etc.
+        default:
+            console.warn("Unknown command:", command);
+    }
+};
+
   
   //For basic operations which don't need value parameter
   optionsButtons.forEach((button) => {
@@ -102,9 +141,12 @@ console.log("Value:", value);
 });
 
 // Specifically for the fontName dropdown
+// Specifically for the fontName dropdown
 fontName.addEventListener("change", () => {
-    modifyText("fontName", false, fontName.value);
+    const selectedFont = fontName.value;
+    applyStyleToSelection("fontFamily", selectedFont);
 });
+
 
   
   //link
