@@ -57,12 +57,26 @@ const initializer = () => {
     if (!selection.rangeCount || selection.isCollapsed) return; // No selection or selection is empty
 
     const range = selection.getRangeAt(0); // Get the selected range
+
+    // Check if the selection is already wrapped in a span
+    let parentSpan = range.startContainer.parentNode;
+    while (parentSpan && parentSpan.nodeName !== 'BODY') {
+        if (parentSpan.tagName === 'SPAN' && parentSpan.style[styleProperty]) {
+            // If it already has the style, update it
+            parentSpan.style[styleProperty] = value;
+            return;
+        }
+        parentSpan = parentSpan.parentNode;
+    }
+
+    // If not, create a new span and apply the style
     const span = document.createElement("span"); // Create a span to hold the styled text
     span.style[styleProperty] = value; // Set the desired style
 
     // Surround the selected text with the styled span
     range.surroundContents(span);
 };
+
 
 // Main logic
 const modifyText = (command, defaultUi, value) => {
@@ -74,7 +88,7 @@ const modifyText = (command, defaultUi, value) => {
             applyStyleToSelection("fontFamily", value); // Apply font family
             break;
         case "fontSize":
-            applyStyleToSelection("fontSize", value + "pt"); // Apply font size with unit
+            applyStyleToSelection("fontSize", value + "px"); // Apply font size with unit
             break;
         case "foreColor":
             applyStyleToSelection("color", value); // Apply font color
@@ -118,6 +132,12 @@ const modifyText = (command, defaultUi, value) => {
             case "justifyRight":
             document.execCommand("justifyRight", defaultUi, null); // Apply italic
             break;
+            case "createLink":
+            document.execCommand("createLink", defaultUi, null); // Apply italic
+            break;
+            case "unlink":
+            document.execCommand("unlink", defaultUi, null); // Apply italic
+            break;
         
         // Add other cases for alignments, spacings, etc.
         default:
@@ -147,19 +167,30 @@ fontName.addEventListener("change", () => {
     applyStyleToSelection("fontFamily", selectedFont);
 });
 
+fontSizeRef.addEventListener("change", () => {
+    const selectedSize = fontSizeRef.value; // Get selected size
+    applyStyleToSelection("fontSize", selectedSize + "pt"); // Apply selected size
+});
 
   
   //link
   linkButton.addEventListener("click", () => {
     let userLink = prompt("Enter a URL");
-    //if link has http then pass directly else add https
-    if (/http/i.test(userLink)) {
-      modifyText(linkButton.id, false, userLink);
-    } else {
-      userLink = "http://" + userLink;
-      modifyText(linkButton.id, false, userLink);
+
+    // Check if the link is valid and add 'http://' if missing
+    if (userLink && !/^https?:\/\//i.test(userLink)) {
+        userLink = "http://" + userLink;
     }
-  });
+
+    // Only apply the link if a valid URL was entered
+    if (userLink) {
+        // Create the link with the selected text
+        document.execCommand("createLink", false, userLink);
+    } else {
+        alert("Please enter a valid URL.");
+    }
+});
+
   
   //Highlight clicked button
   const highlighter = (className, needsRemoval) => {
